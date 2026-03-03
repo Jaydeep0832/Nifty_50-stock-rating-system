@@ -184,29 +184,6 @@ Rating  Company                        Score
 ...
 ```
 
-## 🔬 Technical Highlights
-
-- Multi-model ensemble
-- Sequence modeling
-- Feature normalization
-- Early stopping
-- Learning rate scheduling
-- Gradient clipping
-- Robust validation split (time-based)
-- Production-style modular structure
-- Fully reproducible pipeline
-
-## 🎓 Learning Outcomes
-
-This project demonstrates:
-- Financial feature engineering
-- Deep learning for time series
-- Ensemble modeling
-- Model evaluation in finance
-- Ranking system design
-- End-to-end ML pipeline deployment
-
-
 ## 🌟 Future Improvements
 - Transformer-based time-series model
 - Cross-sectional ranking loss
