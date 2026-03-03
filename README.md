@@ -2,10 +2,10 @@
 
 An end-to-end Machine Learning pipeline that predicts multi-horizon stock returns and generates AI-driven ratings for NIFTY-50 companies using:
 
-- 🌳 LightGBM (Gradient Boosting)
-- 🔁 LSTM (Sequence Learning)
-- 🧠 1D-CNN (Temporal Pattern Recognition)
-- 📊 Ensemble Blending
+-  LightGBM (Gradient Boosting)
+-  LSTM (Sequence Learning)
+-  1D-CNN (Temporal Pattern Recognition)
+-  Ensemble Blending
 - ⭐ Percentile-based Stock Ratings (1–10)
 
 This project combines traditional financial indicators with deep learning to create a robust stock ranking system.
