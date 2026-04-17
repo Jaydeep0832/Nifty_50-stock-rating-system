@@ -1,0 +1,85 @@
+project:
+  name: "NIFTY 50 Stock Rating System"
+  version: "1.0.0"
+
+# Data
+data:
+  start_date: "2015-01-01"
+  end_date: "2025-12-31"
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  predictions_dir: "data/predictions"
+  file_format: "parquet"  
+
+# Features
+features:
+  warmup_days: 252          
+  scaler: "robust"          
+  ema_windows: [9, 21, 50, 200]
+  sma_windows: [10, 20, 50, 200]
+  rsi_window: 14
+  macd_fast: 12
+  macd_slow: 26
+  macd_signal: 9
+  atr_window: 14
+  volatility_window: 20
+  volume_zscore_window: 20
+  momentum_windows: [5, 10, 20]
+  drawdown_window: 252
+
+# Targets
+targets:
+  forward_days: [10, 20, 30]
+
+# Splitting
+split:
+  train_ratio: 0.70
+  val_ratio: 0.15
+  test_ratio: 0.15
+
+# LightGBM
+lgbm:
+  n_estimators: 2000
+  learning_rate: 0.01
+  max_depth: 7
+  num_leaves: 63
+  subsample: 0.8
+  colsample_bytree: 0.8
+  early_stopping_rounds: 100
+  optuna_trials: 50
+  random_state: 42
+
+# TFT
+tft:
+  input_chunk_length: 30    
+  output_chunk_length: 30   
+  hidden_size: 64
+  attention_heads: 4
+  dropout: 0.1
+  num_encoder_layers: 2
+  num_decoder_layers: 2
+  batch_size: 64
+  max_epochs: 100
+  learning_rate: 0.001
+  patience: 10             
+  random_state: 42
+
+#Ensemble
+ensemble:
+  method: "ic_weighted"     
+  ic_lookback_days: 60    
+
+# Rating
+rating:
+  scale_min: 1
+  scale_max: 10
+
+# API
+api:
+  host: "0.0.0.0"
+  port: 8000
+
+# Logging
+logging:
+  level: "INFO"
+  file: "logs/app.log"
