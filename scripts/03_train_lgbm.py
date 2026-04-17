@@ -1,4 +1,4 @@
-"""Train LightGBM models for multi-horizon forward return prediction."""
+"""Train XGBoost models for multi-horizon forward return prediction."""
 
 import sys
 import argparse
@@ -10,7 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from src.utils.config import load_config, get_path
 from src.utils.logger import setup_logger
-from src.models.lgbm_model import train_lgbm, predict_lgbm, optimize_lgbm
+from src.models.xgboost_model import train_xgboost, predict_xgboost, optimize_xgboost
 from src.evaluation.metrics import evaluate_predictions, plot_pred_vs_actual, plot_feature_importance
 
 
@@ -43,10 +43,10 @@ def main():
     args = parser.parse_args()
     
     config = load_config()
-    logger = setup_logger("train_lgbm", config["logging"]["level"], config["logging"]["file"])
+    logger = setup_logger("train_xgboost", config["logging"]["level"], config["logging"]["file"])
     
     logger.info("=" * 60)
-    logger.info("STEP 3: Training LightGBM Models")
+    logger.info("STEP 3: Training XGBoost Models")
     logger.info("=" * 60)
     
     df, feature_cols = load_data(config)
@@ -74,19 +74,19 @@ def main():
         
         if args.optimize:
             logger.info(f"Running Optuna optimization for {target}...")
-            best_params = optimize_lgbm(
+            best_params = optimize_xgboost(
                 X_train, y_train, X_val, y_val,
-                n_trials=config["lgbm"]["optuna_trials"],
+                n_trials=config["xgboost"]["optuna_trials"],
                 target_name=target,
             )
-            params = {**config["lgbm"], **best_params}
+            params = {**config["xgboost"], **best_params}
         else:
-            params = config["lgbm"]
+            params = config["xgboost"]
         
-        model = train_lgbm(X_train, y_train, X_val, y_val, params, target)
-        preds = predict_lgbm(model, X_test)
+        model = train_xgboost(X_train, y_train, X_val, y_val, params, target)
+        preds = predict_xgboost(model, X_test)
         
-        metrics = evaluate_predictions(y_test.values, preds, label=f"LightGBM-{target}")
+        metrics = evaluate_predictions(y_test.values, preds, label=f"XGBoost-{target}")
         all_results[target] = metrics
         
         pred_df = pd.DataFrame({
@@ -94,13 +94,13 @@ def main():
             "predicted": preds,
             "ticker": test_clean["Ticker"].values if "Ticker" in test_clean.columns else "unknown",
         }, index=test_clean.index)
-        pred_df.to_csv(predictions_dir / f"lgbm_{target}_predictions.csv")
+        pred_df.to_csv(predictions_dir / f"xgb_{target}_predictions.csv")
         
-        plot_pred_vs_actual(y_test.values, preds, f"LightGBM: {target}", f"lgbm_{target}_scatter")
-        plot_feature_importance(model, feature_cols, top_n=20, save_name=f"lgbm_{target}_importance")
+        plot_pred_vs_actual(y_test.values, preds, f"XGBoost: {target}", f"xgb_{target}_scatter")
+        plot_feature_importance(model, feature_cols, top_n=20, save_name=f"xgb_{target}_importance")
     
     logger.info("\n" + "=" * 60)
-    logger.info("LightGBM Training Summary:")
+    logger.info("XGBoost Training Summary:")
     for target, m in all_results.items():
         logger.info(f"  {target} → RMSE={m['RMSE']:.6f} | Dir.Acc={m['Directional_Accuracy']:.1f}% | IC={m['Spearman_IC']:.4f}")
     logger.info("=" * 60)

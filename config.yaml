@@ -37,14 +37,17 @@ split:
   val_ratio: 0.15
   test_ratio: 0.15
 
-# LightGBM
-lgbm:
+# XGBoost
+xgboost:
   n_estimators: 2000
   learning_rate: 0.01
   max_depth: 7
-  num_leaves: 63
   subsample: 0.8
   colsample_bytree: 0.8
+  min_child_weight: 1
+  gamma: 0
+  reg_alpha: 0
+  reg_lambda: 1
   early_stopping_rounds: 100
   optuna_trials: 50
   random_state: 42
