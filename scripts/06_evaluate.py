@@ -15,7 +15,7 @@ from src.evaluation.metrics import (
     plot_ic_over_time,
     plot_feature_importance,
 )
-from src.models.lgbm_model import load_lgbm
+from src.models.xgboost_model import load_xgboost
 from src.models.ensemble import compute_rolling_ic
 
 
@@ -37,18 +37,18 @@ def main():
     
     for horizon in horizons:
         target = f"fwd_return_{horizon}"
-        lgbm_file = predictions_dir / f"lgbm_{target}_predictions.csv"
+        xgb_file = predictions_dir / f"xgb_{target}_predictions.csv"
         
-        if not lgbm_file.exists():
+        if not xgb_file.exists():
             logger.warning(f"Predictions not found for {target}")
             continue
         
-        preds = pd.read_csv(lgbm_file, index_col=0, parse_dates=True)
+        preds = pd.read_csv(xgb_file, index_col=0, parse_dates=True)
         
         metrics = evaluate_predictions(
             preds["actual"].values,
             preds["predicted"].values,
-            label=f"LightGBM-{target}",
+            label=f"XGBoost-{target}",
         )
         metrics["target"] = target
         all_metrics.append(metrics)
@@ -74,7 +74,7 @@ def main():
         
         # Feature importance
         try:
-            model = load_lgbm(target)
+            model = load_xgboost(target)
             plot_feature_importance(
                 model, feature_cols, top_n=20,
                 save_name=f"eval_{target}_feat_importance",

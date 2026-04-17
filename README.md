@@ -1,11 +1,11 @@
 # 🚀 NIFTY 50 Stock Rating System
 
-AI-Powered stock analysis using **LightGBM + Temporal Fusion Transformer** ensemble to predict multi-horizon forward returns and rate NIFTY 50 stocks on a 1-10 scale.
+AI-Powered stock analysis using **XGBoost + Temporal Fusion Transformer** ensemble to predict multi-horizon forward returns and rate NIFTY 50 stocks on a 1-10 scale.
 
 ## 📊 Core ML Features
 
 - **25+ Technical Indicators** — RSI, MACD, EMA, ATR, Bollinger Bands, ADX, Stochastic, CCI, OBV, Williams %R, and derivatives
-- **Dual-Model Ensemble** — LightGBM (tabular) + Temporal Fusion Transformer (time-series)
+- **Dual-Model Ensemble** — XGBoost (tabular) + Temporal Fusion Transformer (time-series)
 - **Multi-Horizon Predictions** — 10-day, 20-day, 30-day forward returns
 - **IC-Weighted Ensemble** — Dynamic model weighting via Spearman rank correlation
 - **Statistical Rating Scale** — Percentile-based composite 1-10 ratings
@@ -35,11 +35,11 @@ python -m scripts.01_fetch_data
 # Step 2: Generate features + targets
 python -m scripts.02_build_features
 
-# Step 3: Train LightGBM models
-python -m scripts.03_train_lgbm
+# Step 3: Train XGBoost models
+python -m scripts.03_train_xgboost
 
 # Step 3 (optional): With Optuna hyperparameter tuning
-python -m scripts.03_train_lgbm --optimize
+python -m scripts.03_train_xgboost --optimize
 
 # Step 4: Train TFT models
 python -m scripts.04_train_tft
@@ -65,7 +65,7 @@ Open http://localhost:8000 in your browser.
 ├── src/
 │   ├── data/                # Data fetching & loading
 │   ├── features/            # 25+ technical indicators & scaling
-│   ├── models/              # LightGBM, TFT, ensemble architecture
+│   ├── models/              # XGBoost, TFT, ensemble architecture
 │   ├── rating/              # Percentile-based rating system
 │   ├── evaluation/          # Performance metrics & visualization
 │   └── utils/               # Configuration & logging
@@ -81,14 +81,14 @@ Open http://localhost:8000 in your browser.
 All parameters are in `config.yaml`:
 - Data dates and file formats
 - Feature windows (RSI, MACD, EMA, ATR, Bollinger Bands, etc.)
-- LightGBM hyperparameters & Optuna trials
+- XGBoost hyperparameters & Optuna trials
 - TFT architecture (attention heads, layers, dropout)
 - Ensemble weighting strategy
 - Rating scale parameters
 
 ## Models
 
-### LightGBM
+### XGBoost
 - 2000 estimators with early stopping
 - Optuna hyperparameter optimization (50 trials)
 - Evaluated on RMSE, Directional Accuracy, Spearman IC

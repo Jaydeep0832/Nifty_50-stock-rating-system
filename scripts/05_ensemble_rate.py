@@ -9,7 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from src.utils.config import load_config, get_path, PROJECT_ROOT
 from src.utils.logger import setup_logger
-from src.models.lgbm_model import load_lgbm
+from src.models.xgboost_model import load_xgboost
 from src.rating.rater import compute_ratings
 
 
@@ -57,7 +57,7 @@ def main():
             target = f"fwd_return_{horizon}"
             
             try:
-                model = load_lgbm(target)
+                model = load_xgboost(target)
                 pred = model.predict(X_latest)[0]
                 stock_predictions[ticker][f"pred_{horizon}"] = pred
             except Exception as e:
@@ -67,7 +67,7 @@ def main():
         logger.debug(f"  {name}: predicted across {len(horizons)} horizons")
     
     if not stock_predictions:
-        logger.error("No predictions generated. Train models first (03_train_lgbm).")
+        logger.error("No predictions generated. Train models first (03_train_xgboost).")
         return
     
     pred_df = pd.DataFrame(stock_predictions.values()).set_index("ticker")

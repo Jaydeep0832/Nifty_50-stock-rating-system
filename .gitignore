@@ -17,7 +17,7 @@ data/processed/
 data/predictions/
 
 # Models
-models/lgbm/
+models/xgboost/
 models/tft/
 
 # Outputs

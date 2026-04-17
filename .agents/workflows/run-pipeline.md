@@ -26,14 +26,14 @@ Ensure the virtual environment is activated.
 .\venv\Scripts\python.exe -m scripts.02_build_features
 ```
 
-4. Train LightGBM models (all horizons):
+4. Train XGBoost models (all horizons):
 ```
-.\venv\Scripts\python.exe -m scripts.03_train_lgbm
+.\venv\Scripts\python.exe -m scripts.03_train_xgboost
 ```
 
-5. (Optional) Train LightGBM with Optuna optimization:
+5. (Optional) Train XGBoost with Optuna optimization:
 ```
-.\venv\Scripts\python.exe -m scripts.03_train_lgbm --optimize
+.\venv\Scripts\python.exe -m scripts.03_train_xgboost --optimize
 ```
 
 6. Train TFT models:

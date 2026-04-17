@@ -1,10 +1,8 @@
-"""
-LightGBM model — training, prediction, and Optuna hyperparameter tuning.
-"""
+"""XGBoost model — training, prediction, and Optuna hyperparameter tuning."""
 
 import numpy as np
 import pandas as pd
-import lightgbm as lgb
+import xgboost as xgb
 import optuna
 import joblib
 from pathlib import Path
@@ -13,74 +11,70 @@ from scipy.stats import spearmanr
 from src.utils.config import PROJECT_ROOT
 from src.utils.logger import setup_logger
 
-logger = setup_logger("lgbm")
+logger = setup_logger("xgboost")
 
 optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 
-def train_lgbm(
+def train_xgboost(
     X_train: pd.DataFrame,
     y_train: pd.Series,
     X_val: pd.DataFrame,
     y_val: pd.Series,
     params: dict,
     target_name: str = "fwd_return_10",
-) -> lgb.LGBMRegressor:
-    """Train a LightGBM regressor with early stopping.
+) -> xgb.XGBRegressor:
+    """Train an XGBoost regressor with early stopping.
     
     Args:
         X_train, y_train: Training data.
         X_val, y_val: Validation data.
-        params: LightGBM hyperparameters from config.
+        params: XGBoost hyperparameters from config.
         target_name: Name for logging and saving.
     
     Returns:
-        Trained LGBMRegressor.
+        Trained XGBRegressor.
     """
-    model = lgb.LGBMRegressor(
+    model = xgb.XGBRegressor(
         n_estimators=params["n_estimators"],
         learning_rate=params["learning_rate"],
         max_depth=params["max_depth"],
-        num_leaves=params["num_leaves"],
         subsample=params["subsample"],
         colsample_bytree=params["colsample_bytree"],
         random_state=params["random_state"],
-        verbosity=-1,
+        verbosity=0,
         n_jobs=-1,
+        early_stopping_rounds=params["early_stopping_rounds"],
     )
     
     model.fit(
         X_train, y_train,
         eval_set=[(X_val, y_val)],
-        callbacks=[
-            lgb.early_stopping(params["early_stopping_rounds"]),
-            lgb.log_evaluation(period=200),
-        ],
+        verbose=100,
     )
     
-    logger.info(f"LightGBM trained for {target_name} — best iter: {model.best_iteration_}")
+    logger.info(f"XGBoost trained for {target_name} — best iteration: {model.best_iteration}")
     
-    # Save model
-    save_dir = PROJECT_ROOT / "models" / "lgbm"
+    save_dir = PROJECT_ROOT / "models" / "xgboost"
     save_dir.mkdir(parents=True, exist_ok=True)
-    joblib.dump(model, save_dir / f"lgbm_{target_name}.joblib")
-    logger.info(f"Model saved to {save_dir / f'lgbm_{target_name}.joblib'}")
+    joblib.dump(model, save_dir / f"xgb_{target_name}.joblib")
+    logger.info(f"Model saved to {save_dir / f'xgb_{target_name}.joblib'}")
     
     return model
 
 
-def predict_lgbm(model: lgb.LGBMRegressor, X: pd.DataFrame) -> np.ndarray:
-    """Generate predictions from a trained LightGBM model."""
+def predict_xgboost(model: xgb.XGBRegressor, X: pd.DataFrame) -> np.ndarray:
+    """Generate predictions from a trained XGBoost model."""
     return model.predict(X)
 
 
-def load_lgbm(target_name: str = "fwd_return_10") -> lgb.LGBMRegressor:
-    """Load a saved LightGBM model."""
-    path = PROJECT_ROOT / "models" / "lgbm" / f"lgbm_{target_name}.joblib"
+def load_xgboost(target_name: str = "fwd_return_10") -> xgb.XGBRegressor:
+    """Load a saved XGBoost model."""
+    path = PROJECT_ROOT / "models" / "xgboost" / f"xgb_{target_name}.joblib"
     return joblib.load(path)
 
 
-def optimize_lgbm(
+def optimize_xgboost(
     X_train: pd.DataFrame,
     y_train: pd.Series,
     X_val: pd.DataFrame,
@@ -88,7 +82,7 @@ def optimize_lgbm(
     n_trials: int = 50,
     target_name: str = "fwd_return_10",
 ) -> dict:
-    """Optimize LightGBM hyperparameters with Optuna.
+    """Optimize XGBoost hyperparameters with Optuna.
     
     Returns:
         Best hyperparameters dict.
@@ -98,24 +92,26 @@ def optimize_lgbm(
             "n_estimators": 2000,
             "learning_rate": trial.suggest_float("learning_rate", 0.005, 0.1, log=True),
             "max_depth": trial.suggest_int("max_depth", 3, 10),
-            "num_leaves": trial.suggest_int("num_leaves", 15, 127),
             "subsample": trial.suggest_float("subsample", 0.5, 1.0),
             "colsample_bytree": trial.suggest_float("colsample_bytree", 0.5, 1.0),
-            "min_child_samples": trial.suggest_int("min_child_samples", 5, 100),
+            "min_child_weight": trial.suggest_int("min_child_weight", 1, 10),
+            "gamma": trial.suggest_float("gamma", 0, 5),
             "reg_alpha": trial.suggest_float("reg_alpha", 1e-8, 10.0, log=True),
             "reg_lambda": trial.suggest_float("reg_lambda", 1e-8, 10.0, log=True),
         }
         
-        model = lgb.LGBMRegressor(
-            **params, random_state=42, verbosity=-1, n_jobs=-1
+        model = xgb.XGBRegressor(
+            **params,
+            random_state=42,
+            verbosity=0,
+            n_jobs=-1,
+            early_stopping_rounds=100,
         )
         
         model.fit(
             X_train, y_train,
             eval_set=[(X_val, y_val)],
-            callbacks=[
-                lgb.early_stopping(100),
-            ],
+            verbose=False,
         )
         
         preds = model.predict(X_val)
@@ -128,8 +124,7 @@ def optimize_lgbm(
     logger.info(f"Optuna best RMSE: {study.best_value:.6f}")
     logger.info(f"Best params: {study.best_params}")
     
-    # Save best params
-    save_path = PROJECT_ROOT / "models" / "lgbm" / f"best_params_{target_name}.joblib"
+    save_path = PROJECT_ROOT / "models" / "xgboost" / f"best_params_{target_name}.joblib"
     save_path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(study.best_params, save_path)
     

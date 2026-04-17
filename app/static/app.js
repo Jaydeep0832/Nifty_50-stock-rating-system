@@ -504,17 +504,17 @@ function renderModelPage(status, accuracy) {
     // Model status
     let statusHtml = '<div class="grid-3" style="margin-bottom:24px">';
     ['fwd_return_10','fwd_return_20','fwd_return_30'].forEach(target => {
-        const lgbm = status.lgbm[target] || {};
+        const xgboost = status.xgboost[target] || {};
         const tft = status.tft[target] || {};
         statusHtml += `
             <div class="card">
                 <div class="card-header"><div class="card-title">${target.replace('fwd_return_','')}-Day Horizon</div></div>
                 <div class="card-body">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-                        <span style="font-weight:600;font-size:0.85rem">LightGBM</span>
-                        <span class="${lgbm.trained?'chip-trained':'chip-not-trained'}">${lgbm.trained?'✓ Trained':'✗ Not Trained'}</span>
+                        <span style="font-weight:600;font-size:0.85rem">XGBoost</span>
+                        <span class="${xgboost.trained?'chip-trained':'chip-not-trained'}">${xgboost.trained?'✓ Trained':'✗ Not Trained'}</span>
                     </div>
-                    ${lgbm.trained ? `<div style="font-size:0.75rem;color:var(--text-muted)">Size: ${lgbm.size_mb} MB</div>` : ''}
+                    ${xgboost.trained ? `<div style="font-size:0.75rem;color:var(--text-muted)">Size: ${xgboost.size_mb} MB</div>` : ''}
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
                         <span style="font-weight:600;font-size:0.85rem">TFT (Transformer)</span>
                         <span class="${tft.trained?'chip-trained':'chip-not-trained'}">${tft.trained?'✓ Trained':'✗ Not Trained'}</span>
@@ -547,11 +547,10 @@ function renderModelPage(status, accuracy) {
     // Parameters
     let paramsHtml = '<div class="grid-2" style="margin-bottom:24px">';
 
-    // LightGBM params
-    const lgbmCfg = accuracy.current_config?.lgbm || {};
-    paramsHtml += `<div class="card"><div class="card-header"><div class="card-title">⚙️ LightGBM Parameters</div></div>
+    const xgboostCfg = accuracy.current_config?.xgboost || {};
+    paramsHtml += `<div class="card"><div class="card-header"><div class="card-title">⚙️ XGBoost Parameters</div></div>
         <div class="card-body-flush"><table class="param-table"><thead><tr><th>Parameter</th><th>Value</th></tr></thead><tbody>`;
-    Object.entries(lgbmCfg).forEach(([k,v]) => {
+    Object.entries(xgboostCfg).forEach(([k,v]) => {
         paramsHtml += `<tr><td>${k}</td><td>${v}</td></tr>`;
     });
     paramsHtml += '</tbody></table></div></div>';

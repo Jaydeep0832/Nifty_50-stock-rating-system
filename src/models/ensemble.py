@@ -1,4 +1,4 @@
-"""IC-weighted ensemble — combines LightGBM + TFT predictions using Spearman IC."""
+"""IC-weighted ensemble — combines XGBoost + TFT predictions using Spearman IC."""
 
 import numpy as np
 import pandas as pd
@@ -48,20 +48,20 @@ def compute_rolling_ic(
 
 
 def ensemble_predictions(
-    lgbm_preds: np.ndarray,
+    xgboost_preds: np.ndarray,
     tft_preds: np.ndarray,
-    lgbm_actuals: np.ndarray = None,
+    xgboost_actuals: np.ndarray = None,
     tft_actuals: np.ndarray = None,
     dates: pd.DatetimeIndex = None,
     method: str = "ic_weighted",
     lookback: int = 60,
 ) -> np.ndarray:
-    """Combine predictions from two models.
+    """Combine predictions from XGBoost and TFT models.
     
     Args:
-        lgbm_preds: LightGBM predictions.
+        xgboost_preds: XGBoost predictions.
         tft_preds: TFT predictions.
-        lgbm_actuals: Actuals for LightGBM IC calculation.
+        xgboost_actuals: Actuals for XGBoost IC calculation.
         tft_actuals: Actuals for TFT IC calculation.
         dates: Date index.
         method: 'ic_weighted' or 'simple_average'.
@@ -70,37 +70,37 @@ def ensemble_predictions(
     Returns:
         Combined prediction array.
     """
-    min_len = min(len(lgbm_preds), len(tft_preds))
-    lgbm_preds = lgbm_preds[:min_len]
+    min_len = min(len(xgboost_preds), len(tft_preds))
+    xgboost_preds = xgboost_preds[:min_len]
     tft_preds = tft_preds[:min_len]
     
     if method == "simple_average":
-        combined = (lgbm_preds + tft_preds) / 2
+        combined = (xgboost_preds + tft_preds) / 2
         logger.info("Ensemble: simple average")
         return combined
     
-    if lgbm_actuals is None or tft_actuals is None or dates is None:
+    if xgboost_actuals is None or tft_actuals is None or dates is None:
         logger.warning("Missing actuals/dates for IC — falling back to simple average")
-        return (lgbm_preds + tft_preds) / 2
+        return (xgboost_preds + tft_preds) / 2
     
-    lgbm_actuals = lgbm_actuals[:min_len]
+    xgboost_actuals = xgboost_actuals[:min_len]
     tft_actuals = tft_actuals[:min_len]
     dates = dates[:min_len]
     
-    lgbm_ic = compute_rolling_ic(lgbm_preds, lgbm_actuals, dates, lookback)
+    xgboost_ic = compute_rolling_ic(xgboost_preds, xgboost_actuals, dates, lookback)
     tft_ic = compute_rolling_ic(tft_preds, tft_actuals, dates, lookback)
     
-    lgbm_abs_ic = lgbm_ic.abs().fillna(0.5)
+    xgboost_abs_ic = xgboost_ic.abs().fillna(0.5)
     tft_abs_ic = tft_ic.abs().fillna(0.5)
     
-    total = lgbm_abs_ic + tft_abs_ic + 1e-8
-    lgbm_weight = lgbm_abs_ic / total
+    total = xgboost_abs_ic + tft_abs_ic + 1e-8
+    xgboost_weight = xgboost_abs_ic / total
     tft_weight = tft_abs_ic / total
     
-    combined = lgbm_weight.values * lgbm_preds + tft_weight.values * tft_preds
+    combined = xgboost_weight.values * xgboost_preds + tft_weight.values * tft_preds
     
-    avg_lgbm_w = lgbm_weight.mean()
+    avg_xgb_w = xgboost_weight.mean()
     avg_tft_w = tft_weight.mean()
-    logger.info(f"IC-weighted ensemble — Avg weights: LightGBM={avg_lgbm_w:.3f}, TFT={avg_tft_w:.3f}")
+    logger.info(f"IC-weighted ensemble — Avg weights: XGBoost={avg_xgb_w:.3f}, TFT={avg_tft_w:.3f}")
     
     return combined

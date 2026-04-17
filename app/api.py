@@ -262,7 +262,7 @@ async def get_stock_detail(ticker: str):
     pred_dir = get_path(config, "data.predictions_dir")
     for horizon in config["targets"]["forward_days"]:
         target = f"fwd_return_{horizon}"
-        path = pred_dir / f"lgbm_{target}_predictions.csv"
+        path = pred_dir / f"xgb_{target}_predictions.csv"
         if path.exists():
             pred_df = pd.read_csv(path, index_col=0, parse_dates=True)
             if "ticker" in pred_df.columns:
@@ -446,22 +446,20 @@ async def get_all_indicators():
 @app.get("/api/model/status")
 async def get_model_status():
     """Check training status of all models."""
-    lgbm_dir = PROJECT_ROOT / "models" / "lgbm"
+    xgboost_dir = PROJECT_ROOT / "models" / "xgboost"
     tft_dir = PROJECT_ROOT / "models" / "tft"
 
-    lgbm_models = {}
+    xgboost_models = {}
     tft_models = {}
 
     for horizon in config["targets"]["forward_days"]:
         target = f"fwd_return_{horizon}"
-        # LightGBM
-        lgbm_path = lgbm_dir / f"lgbm_{target}.joblib"
-        lgbm_models[target] = {
-            "trained": lgbm_path.exists(),
-            "path": str(lgbm_path) if lgbm_path.exists() else None,
-            "size_mb": round(lgbm_path.stat().st_size / 1e6, 2) if lgbm_path.exists() else 0,
+        xgboost_path = xgboost_dir / f"xgb_{target}.joblib"
+        xgboost_models[target] = {
+            "trained": xgboost_path.exists(),
+            "path": str(xgboost_path) if xgboost_path.exists() else None,
+            "size_mb": round(xgboost_path.stat().st_size / 1e6, 2) if xgboost_path.exists() else 0,
         }
-        # TFT — Darts saves as directory with checkpoints
         tft_path = tft_dir / f"tft_{target}"
         tft_trained = tft_path.exists() and tft_path.is_dir()
         tft_models[target] = {
@@ -470,7 +468,7 @@ async def get_model_status():
         }
 
     return {
-        "lgbm": lgbm_models,
+        "xgboost": xgboost_models,
         "tft": tft_models,
         "scaler_exists": (PROJECT_ROOT / "models" / "feature_scaler.joblib").exists(),
     }
@@ -494,20 +492,19 @@ async def get_model_accuracy():
             })
 
     # Load best params if available
-    lgbm_dir = PROJECT_ROOT / "models" / "lgbm"
+    xgboost_dir = PROJECT_ROOT / "models" / "xgboost"
     best_params = {}
     import joblib
     for horizon in config["targets"]["forward_days"]:
         target = f"fwd_return_{horizon}"
-        param_path = lgbm_dir / f"best_params_{target}.joblib"
+        param_path = xgboost_dir / f"best_params_{target}.joblib"
         if param_path.exists():
             best_params[target] = joblib.load(param_path)
         else:
-            best_params[target] = config["lgbm"]
+            best_params[target] = config["xgboost"]
 
-    # Current config params
     current_config = {
-        "lgbm": config["lgbm"],
+        "xgboost": config["xgboost"],
         "tft": config["tft"],
         "features": {
             "warmup_days": config["features"]["warmup_days"],
