@@ -566,3 +566,5 @@ For detailed documentation:
 **Ready to use!** 🚀
 
 ---
+
+*Last Updated: December 2025*
