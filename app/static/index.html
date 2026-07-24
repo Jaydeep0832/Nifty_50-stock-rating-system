@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-Powered NIFTY 50 Stock Rating System — Real-time candlestick charts, technical indicator analysis, ML predictions.">
+    <title>NIFTY 50 — AI Stock Ratings</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-logo">N50</div>
+            <span class="brand-text">NIFTY Ratings</span>
+        </div>
+        <div class="sidebar-menu">
+            <a class="nav-item active" data-page="dashboard" id="nav-dashboard">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">Dashboard</span>
+            </a>
+            <a class="nav-item" data-page="stock" id="nav-stock">
+                <span class="nav-icon">📈</span>
+                <span class="nav-label">Stock Analysis</span>
+            </a>
+            <a class="nav-item" data-page="indicators" id="nav-indicators">
+                <span class="nav-icon">🔬</span>
+                <span class="nav-label">Indicators</span>
+            </a>
+            <a class="nav-item" data-page="model" id="nav-model">
+                <span class="nav-icon">🤖</span>
+                <span class="nav-label">Model Performance</span>
+            </a>
+        </div>
+        <div class="sidebar-footer">
+            <div class="sidebar-status">
+                <span class="status-dot"></span>
+                <span id="sidebar-status-text">Loading...</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content" id="main-content">
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="menu-toggle" id="menu-toggle">☰</button>
+                <h1 class="page-title" id="page-title">Dashboard</h1>
+            </div>
+            <div class="topbar-right">
+                <div class="search-box">
+                    <span class="search-icon-sm">🔍</span>
+                    <input type="text" id="global-search" placeholder="Search stocks..." class="search-input-sm">
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Container -->
+        <div class="page-container" id="page-container">
+            <!-- Pages will be rendered here by JS -->
+            <div class="loading-container">
+                <div class="spinner"></div>
+                <div class="loading-text">Loading application...</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Stock Detail Modal (overlay for quick view from any page) -->
+    <div class="modal-overlay" id="stock-modal">
+        <div class="modal-content modal-xl">
+            <div class="modal-header">
+                <div>
+                    <h2 id="modal-ticker" class="modal-title"></h2>
+                    <p id="modal-subtitle" class="modal-sub"></p>
+                </div>
+                <button class="modal-close" id="modal-close">✕</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <div class="loading-container"><div class="spinner"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
