@@ -61,22 +61,21 @@ Rather than relying on raw return percentages which can be difficult for traders
 
 ```mermaid
 flowchart TD
-    A["📊 1️⃣ Data & Feature Pipeline<br/>• 10 Years NIFTY 50 OHLCV Data (125,869 Samples)<br/>• 25+ Technical Indicators (RSI, MACD, EMA, ATR, ADX)<br/>• Robust Feature Scaling & Target Variable Builder"]
+    A["<br/><b>1️⃣ DATA & FEATURE PIPELINE</b><br/><br/><i>Raw OHLCV Data • 25+ Technical Indicators • Robust Scaling</i><br/><br/>"]
 
-    A --> B1["🤖 2️⃣a XGBoost Regressor Engine<br/><b>Tabular Learning (All 50 Stocks)</b><br/>• Fast & Robust Gradient Boosted Decision Trees<br/>• Multi-Horizon Forward Return Predictions"]
+    A --> B1["<br/><b>2️⃣a XGBoost Engine</b><br/><br/><i>Tabular ML (All 50 Stocks)</i><br/><br/>"]
+    A --> B2["<br/><b>2️⃣b TFT Deep Learning</b><br/><br/><i>Self-Attention (Top Stocks)</i><br/><br/>"]
 
-    A --> B2["🧠 2️⃣b Temporal Fusion Transformer (TFT)<br/><b>Deep Learning (Top Liquid Stocks)</b><br/>• Multi-Head Self-Attention Mechanism<br/>• Sequential Time-Series Dynamics"]
-
-    B1 --> C["⚖️ 3️⃣ Fusion & Percentile Rating Engine<br/>• Spearman IC-Weighted Ensemble (Dynamic Weight = |IC| / Sum|IC|)<br/>• Cross-Sectional Ranking → 1 to 10 Stock Rating Scale"]
+    B1 --> C["<br/><b>3️⃣ IC-WEIGHTED ENSEMBLE & RATINGS</b><br/><br/><i>Spearman IC Fusion • 1-10 Percentile Rating Scale</i><br/><br/>"]
     B2 --> C
 
-    C --> D["💻 4️⃣ FastAPI Server & Interactive Web Dashboard<br/>• Async REST API Layer (/api/stocks, /api/stock/{ticker})<br/>• Web UI for Real-time Ratings, Performance Metrics & Charts"]
+    C --> D["<br/><b>4️⃣ FASTAPI SERVER & DASHBOARD</b><br/><br/><i>REST API Layer • Interactive Web UI</i><br/><br/>"]
 
-    style A fill:#1a1d24,stroke:#3b82f6,stroke-width:2px,color:#ffffff
-    style B1 fill:#1a1d24,stroke:#f59e0b,stroke-width:2px,color:#ffffff
-    style B2 fill:#1a1d24,stroke:#ef4444,stroke-width:2px,color:#ffffff
-    style C fill:#1a1d24,stroke:#10b981,stroke-width:2px,color:#ffffff
-    style D fill:#1a1d24,stroke:#ec4899,stroke-width:2px,color:#ffffff
+    style A fill:#1a1d24,stroke:#3b82f6,stroke-width:3px,color:#ffffff
+    style B1 fill:#1a1d24,stroke:#f59e0b,stroke-width:3px,color:#ffffff
+    style B2 fill:#1a1d24,stroke:#ef4444,stroke-width:3px,color:#ffffff
+    style C fill:#1a1d24,stroke:#10b981,stroke-width:3px,color:#ffffff
+    style D fill:#1a1d24,stroke:#ec4899,stroke-width:3px,color:#ffffff
 ```
 
 ---
