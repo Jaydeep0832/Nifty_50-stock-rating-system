@@ -115,27 +115,6 @@ The system was evaluated across out-of-sample test data for 10-day, 20-day, and 
 
 ---
 
-## 🧠 What I Learned & Key Takeaways
-
-Building this system end-to-end taught me several crucial lessons in applied Machine Learning, Time-Series Analysis, and Software Engineering:
-
-### 1. **Financial Markets Have Low Signal-to-Noise Ratios**
-Unlike image classification where 99% accuracy is common, stock price returns contain high noise. A directional accuracy of 55%-58% is realistic and strong in quant trading. Expecting 80%+ accuracy on raw return prediction usually signals data leakage or overfitting.
-
-### 2. **Multi-Horizon Learning Prevents Single-Frame Bias**
-Model performance varies by forecast duration. I learned that longer windows (30-day) tend to show higher directional accuracy (58.7%) and Spearman IC (0.084) because noise smooths out over multi-week periods, allowing underlying trend signals to dominate.
-
-### 3. **Dynamic IC-Weighting Outperforms Simple Averaging**
-Simply averaging model outputs gives equal weight to a model even when its performance drops. Using 60-day rolling **Spearman Rank Correlation (IC)** to weight models dynamically ensures that whichever model currently captures market dynamics gets greater influence in the final rating.
-
-### 4. **Scalability vs Complexity Trade-off**
-Training complex deep learning architectures like TFT on 50 stocks simultaneously requires heavy memory and compute. Scaling XGBoost across all 50 stocks for breadth while reserving TFT for top stocks gave the optimal balance between speed and temporal attention modeling.
-
-### 5. **Robust Preprocessing Matters More Than Model Complexity**
-Using `RobustScaler` (which uses medians and interquartile ranges) was essential to prevent extreme volatility spikes during market crashes/rallies from distorting feature distributions.
-
----
-
 ## 🚀 Getting Started
 
 Follow these steps to set up and run the system on your local machine.
@@ -259,3 +238,24 @@ All parameters are centrally managed in `config.yaml`:
 - Released under the **MIT License**.
 - Market data sourced via `yfinance`.
 - Special thanks to open-source contributors of PyTorch, Darts, XGBoost, and FastAPI.
+
+---
+
+## 🧠 What I Learned & Key Takeaways
+
+Building this system end-to-end taught me several crucial lessons in applied Machine Learning, Time-Series Analysis, and Software Engineering:
+
+### 1. **Financial Markets Have Low Signal-to-Noise Ratios**
+Unlike image classification where 99% accuracy is common, stock price returns contain high noise. A directional accuracy of 55%-58% is realistic and strong in quant trading. Expecting 80%+ accuracy on raw return prediction usually signals data leakage or overfitting.
+
+### 2. **Multi-Horizon Learning Prevents Single-Frame Bias**
+Model performance varies by forecast duration. I learned that longer windows (30-day) tend to show higher directional accuracy (58.7%) and Spearman IC (0.084) because noise smooths out over multi-week periods, allowing underlying trend signals to dominate.
+
+### 3. **Dynamic IC-Weighting Outperforms Simple Averaging**
+Simply averaging model outputs gives equal weight to a model even when its performance drops. Using 60-day rolling **Spearman Rank Correlation (IC)** to weight models dynamically ensures that whichever model currently captures market dynamics gets greater influence in the final rating.
+
+### 4. **Scalability vs Complexity Trade-off**
+Training complex deep learning architectures like TFT on 50 stocks simultaneously requires heavy memory and compute. Scaling XGBoost across all 50 stocks for breadth while reserving TFT for top stocks gave the optimal balance between speed and temporal attention modeling.
+
+### 5. **Robust Preprocessing Matters More Than Model Complexity**
+Using `RobustScaler` (which uses medians and interquartile ranges) was essential to prevent extreme volatility spikes during market crashes/rallies from distorting feature distributions.
